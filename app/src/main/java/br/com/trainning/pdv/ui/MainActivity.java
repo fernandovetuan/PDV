@@ -78,8 +78,8 @@ public class MainActivity extends BasicActivity {
           Intent intent = new Intent(MainActivity.this, CadastroNovoActivity.class);
           startActivity(intent);
         }else if (id == R.id.action_edit) {
-            Log.d("Main Activity","Selecionou editar produto");
-            return true;
+            Intent intent2 = new Intent(MainActivity.this, EditarProdutoActivity.class);
+            startActivity(intent2);
         }
 
         return super.onOptionsItemSelected(item);
