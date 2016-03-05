@@ -5,13 +5,8 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.support.v7.app.ActionBarActivity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -19,47 +14,30 @@ import java.io.IOException;
 
 import br.com.trainning.pdv.R;
 import br.com.trainning.pdv.domain.util.ImageInputHelper;
-import butterknife.Bind;
 
-public class CadastroNovoActivity extends BasicActivity implements ImageInputHelper.ImageActionListener{
-
-    @Bind(R.id.txtDescricao)
-    EditText txtDescricao;
-    @Bind(R.id.txtUnidade)
-    EditText txtUnidade;
-    @Bind(R.id.txtPreco)
-    EditText txtPreco;
-    @Bind(R.id.txtCodigoBarras)
-    EditText txtCodigoBarras;
+public class SelectImageActivity extends ActionBarActivity implements ImageInputHelper.ImageActionListener {
 
     private ImageInputHelper imageInputHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cadastro_novo);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setContentView(R.layout.activity_select_image);
 
         imageInputHelper = new ImageInputHelper(this);
         imageInputHelper.setImageActionListener(this);
 
-        /*txtDescricao = (EditText)findViewById(R.id.txtDescricao);
-        txtUnidade = (EditText)findViewById(R.id.txtUnidade);
-        txtPreco = (EditText)findViewById(R.id.txtPreco);
-        txtCodigoBarras =  (EditText)findViewById(R.id.txtCodigoBarras);*/
-
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.select_photo_from_gallery).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Log.d("Cadastro",txtDescricao.getText().toString());
-                Log.d("Unidade",txtUnidade.getText().toString());
-                Log.d("Preco",txtPreco.getText().toString());
-                Log.d("Codigo",txtCodigoBarras.getText().toString());
+            public void onClick(View v) {
+                imageInputHelper.selectImageFromGallery();
+            }
+        });
 
+        findViewById(R.id.take_picture_with_camera).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageInputHelper.takePhotoWithCamera();
             }
         });
     }
