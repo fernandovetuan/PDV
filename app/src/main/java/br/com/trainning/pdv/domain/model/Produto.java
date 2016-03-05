@@ -27,6 +27,7 @@ public class Produto extends Model {
     @Column("foto")
     private String foto;
 
+    //teste
     public long getId() {
         return id;
     }
