@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 
 import br.com.trainning.pdv.R;
+import br.com.trainning.pdv.domain.model.Produto;
 import br.com.trainning.pdv.domain.util.ImageInputHelper;
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -41,6 +42,7 @@ public class CadastroNovoActivity extends BasicActivity implements ImageInputHel
     ImageButton imageButtonGaleria;
 
     private ImageInputHelper imageInputHelper;
+    private Produto produto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +53,7 @@ public class CadastroNovoActivity extends BasicActivity implements ImageInputHel
 
         imageInputHelper = new ImageInputHelper(this);
         imageInputHelper.setImageActionListener(this);
+
 
         /*txtDescricao = (EditText)findViewById(R.id.txtDescricao);
         txtUnidade = (EditText)findViewById(R.id.txtUnidade);
@@ -66,6 +69,22 @@ public class CadastroNovoActivity extends BasicActivity implements ImageInputHel
                 Log.d("Preco",txtPreco.getText().toString());
                 Log.d("Codigo",txtCodigoBarras.getText().toString());
 
+                produto = new Produto();
+                produto.setId(0L);
+                produto.setDescricao(txtDescricao.getText().toString());
+                produto.setUnidade(txtUnidade.getText().toString());
+                produto.setCodigoBarras(txtCodigoBarras.getText().toString());
+                if (!txtPreco.getText().toString().equals(""))
+                {
+                    produto.setPreco(Double.parseDouble(txtPreco.getText().toString()));
+                }
+                else
+                {
+                    produto.setPreco(0.0);
+                }
+                produto.setFoto("");
+                produto.save();
+                finish();
             }
         });
     }
