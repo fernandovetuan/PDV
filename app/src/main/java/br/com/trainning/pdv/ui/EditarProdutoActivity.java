@@ -3,6 +3,7 @@ package br.com.trainning.pdv.ui;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -18,6 +19,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+
+import com.mapzen.android.lost.api.LocationServices;
+import com.mapzen.android.lost.api.LostApiClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,6 +59,8 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
     ImageButton imageButtonGaleria;
 
     private ImageInputHelper imageInputHelper;
+    private Double latitude = 0.0d;
+    private Double longitude = 0.0d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,18 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
         setContentView(R.layout.activity_editar_produto);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        LostApiClient lostApiClient = new LostApiClient.Builder(this).build();
+        lostApiClient.connect();
+
+        Location location = LocationServices.FusedLocationApi.getLastLocation();
+        if (location != null) {
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+
+            Log.d("location"," Latitude:" + latitude);
+            Log.d("location"," Longitude:" + longitude);
+        }
 
         imageInputHelper = new ImageInputHelper(this);
         imageInputHelper.setImageActionListener(this);
@@ -82,6 +100,9 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
                 Bitmap imagem = ((BitmapDrawable)imageViewFoto.getDrawable()).getBitmap();
 
                 produto.setFoto(Base64Util.encodeTobase64(imagem));
+
+                produto.setLatitude(latitude);
+                produto.setLongitude(longitude);
 
                 produto.save();
 
@@ -116,6 +137,7 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
 
                 Log.d("BARCODE", "selecionado " + barCode);
 
+
                 produto = Query.one(Produto.class, "select * from produto where codigo_barra = ?",barCode).get();
 
                 if (produto!= null)
@@ -125,6 +147,11 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
                     txtCodigoBarras.setText(produto.getCodigoBarras());
                     txtPreco.setText(String.valueOf(produto.getPreco()));
                     imageViewFoto.setImageBitmap(Base64Util.decodeBase64(produto.getFoto()));
+
+
+                    Log.d("location Produto"," Latitude:" + produto.getLatitude());
+                    Log.d("location Produto"," Latitude:" + produto.getLongitude());
+
                 }
             }
 
