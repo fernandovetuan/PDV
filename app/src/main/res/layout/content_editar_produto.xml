@@ -18,4 +18,106 @@
         android:id="@+id/ddlProduto"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Descrição"
+        android:id="@+id/textView"
+        android:layout_below="@+id/ddlProduto"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtDescricao"
+        android:layout_below="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Unidade"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/txtDescricao"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtUnidade"
+        android:layout_below="@+id/textView2"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/txtDescricao" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Preço"
+        android:id="@+id/textView3"
+        android:layout_below="@+id/txtUnidade"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:ems="10"
+        android:id="@+id/txtPreco"
+        android:layout_below="@+id/textView3"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Código de Barras"
+        android:id="@+id/textView4"
+        android:layout_below="@+id/txtPreco"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txtCodigoBarras"
+        android:layout_below="@+id/textView4"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/txtUnidade" />
+
+    <ImageView
+        android:layout_width="230dp"
+        android:layout_height="230dp"
+        android:id="@+id/imgProduto"
+        android:src="@drawable/produto"
+        android:layout_below="@+id/txtCodigoBarras"
+        android:layout_alignParentStart="true"
+        android:layout_alignEnd="@+id/txtPreco" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnInsertPhoto"
+        android:paddingLeft="10dp"
+        android:src="@drawable/ic_insert_photo_black_48dp"
+        android:background="@null"
+        android:layout_below="@+id/txtCodigoBarras"
+        android:layout_toEndOf="@+id/txtPreco"
+        android:layout_marginTop="43dp" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnCamera"
+        android:paddingLeft="10dp"
+        android:src="@drawable/ic_add_a_photo_black_48dp"
+        android:background="@null"
+        android:layout_below="@+id/btnInsertPhoto"
+        android:layout_alignStart="@+id/btnInsertPhoto"
+        android:layout_marginTop="39dp" />
+
 </RelativeLayout>
