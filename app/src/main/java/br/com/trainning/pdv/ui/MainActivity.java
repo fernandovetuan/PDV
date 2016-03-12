@@ -28,6 +28,7 @@ import br.com.trainning.pdv.domain.adapter.CustomArrayAdapter;
 import br.com.trainning.pdv.domain.model.Item;
 import br.com.trainning.pdv.domain.model.ItemProduto;
 import br.com.trainning.pdv.domain.model.Produto;
+import br.com.trainning.pdv.domain.util.Util;
 import butterknife.Bind;
 import jim.h.common.android.lib.zxing.config.ZXingLibConfig;
 import jim.h.common.android.lib.zxing.integrator.IntentIntegrator;
@@ -76,7 +77,7 @@ public class MainActivity extends BasicActivity {
                 openItem.setBackground(new ColorDrawable(Color.rgb(0xC9, 0xC9,
                         0xCE)));
                 // set item width
-                openItem.setWidth(190);
+                openItem.setWidth(Util.convertPixelsToDp(290,getApplicationContext()));
                 // set item title
                 openItem.setTitle("Open");
                 // set item title fontsize
@@ -93,7 +94,7 @@ public class MainActivity extends BasicActivity {
                 deleteItem.setBackground(new ColorDrawable(Color.rgb(0xF9,
                         0x3F, 0x25)));
                 // set item width
-                deleteItem.setWidth(190);
+                deleteItem.setWidth(Util.convertPixelsToDp(290,getApplicationContext()));
                 // set a icon
                 deleteItem.setIcon(R.drawable.ic_remove_shopping_cart_white_36dp);
                 // add to menu
@@ -119,6 +120,8 @@ public class MainActivity extends BasicActivity {
                 return false;
             }
         });
+
+        popularLista();
 
     }
 
@@ -218,6 +221,19 @@ public class MainActivity extends BasicActivity {
         valorTotal=0.0d;
         quantidadeItens = 0;
 
+        produto = Query.one(Produto.class,"select * from produto where codigo_barra = ?", 10).get();
+        itemProduto = new ItemProduto();
+        itemProduto.setIdCompra(1);
+        itemProduto.setIdItem(1);
+        itemProduto.setUnidade(produto.getUnidade());
+        itemProduto.setFoto(produto.getFoto());
+        itemProduto.setDescricao(produto.getDescricao());
+        itemProduto.setQuantidade(1);
+        itemProduto.setPreco(produto.getPreco());
+        list.add(itemProduto);
+        valorTotal+=produto.getPreco();
+        quantidadeItens += 1;
+
         for(Item item:listaItem){
 
             produto = Query.one(Produto.class,"select * from produto where codigo_barra = ?", item.getIdProduto()).get();
@@ -225,6 +241,7 @@ public class MainActivity extends BasicActivity {
             itemProduto.setIdCompra(1);
             itemProduto.setIdItem(item.getId());
             itemProduto.setFoto(produto.getFoto());
+            itemProduto.setUnidade(produto.getUnidade());
             itemProduto.setDescricao(produto.getDescricao());
             itemProduto.setQuantidade(item.getQuantidade());
             itemProduto.setPreco(produto.getPreco());
@@ -232,7 +249,7 @@ public class MainActivity extends BasicActivity {
             valorTotal+=item.getQuantidade()*produto.getPreco();
             quantidadeItens += item.getQuantidade();
         }
-        getSupportActionBar().setTitle("PDV " + valorTotal);
+        getSupportActionBar().setTitle("PDV " + Util.getFormatedCurrency(String.valueOf(valorTotal)));
         adapter = new CustomArrayAdapter(this, R.layout.list_item, list);
         listView.setAdapter(adapter);
     }
