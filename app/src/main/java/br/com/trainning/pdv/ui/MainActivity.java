@@ -28,11 +28,15 @@ import br.com.trainning.pdv.domain.adapter.CustomArrayAdapter;
 import br.com.trainning.pdv.domain.model.Item;
 import br.com.trainning.pdv.domain.model.ItemProduto;
 import br.com.trainning.pdv.domain.model.Produto;
+import br.com.trainning.pdv.domain.network.APIClient;
 import br.com.trainning.pdv.domain.util.Util;
 import butterknife.Bind;
 import jim.h.common.android.lib.zxing.config.ZXingLibConfig;
 import jim.h.common.android.lib.zxing.integrator.IntentIntegrator;
 import jim.h.common.android.lib.zxing.integrator.IntentResult;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import se.emilsjolander.sprinkles.CursorList;
 import se.emilsjolander.sprinkles.Query;
 
@@ -47,6 +51,8 @@ public class MainActivity extends BasicActivity {
     private double valorTotal;
     private CustomArrayAdapter adapter;
 
+    private Callback<List<Produto>> callbackProdutos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +62,8 @@ public class MainActivity extends BasicActivity {
 
         zxingLibConfig = new ZXingLibConfig();
         zxingLibConfig.useFrontLight = true;
+
+        configureProdutoCallback();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -173,6 +181,9 @@ public class MainActivity extends BasicActivity {
         }else if (id == R.id.action_edit) {
             Intent intent2 = new Intent(MainActivity.this, EditarProdutoActivity.class);
             startActivity(intent2);
+        }else if (id == R.id.action_sincronia) {
+            new APIClient().getRestService().getAllProdutos(callbackProdutos);
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -259,6 +270,32 @@ public class MainActivity extends BasicActivity {
         getSupportActionBar().setTitle("PDV " + Util.getFormatedCurrency(String.valueOf(valorTotal)));
         adapter = new CustomArrayAdapter(this, R.layout.list_item, list);
         listView.setAdapter(adapter);
+    }
+
+    private void configureProdutoCallback() {
+
+        callbackProdutos = new Callback<List<Produto>>() {
+
+            @Override public void success(List<Produto> resultado, Response response) {
+
+                List<Produto> lp  = Query.all(Produto.class).get().asList();
+
+                for(Produto p:lp){
+                    p.delete();
+                }
+
+                for(Produto produto:resultado){
+                    produto.setId(0L);
+                    produto.save();
+                }
+
+            }
+
+            @Override public void failure(RetrofitError error) {
+
+                Log.e("RETROFIT", "Error:"+error.getMessage());
+            }
+        };
     }
 
 }
