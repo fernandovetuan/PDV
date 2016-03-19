@@ -1,5 +1,6 @@
 package br.com.trainning.pdv.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -16,19 +17,27 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.mapzen.android.lost.api.LocationServices;
 import com.mapzen.android.lost.api.LostApiClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import br.com.trainning.pdv.R;
 import br.com.trainning.pdv.domain.model.Produto;
+import br.com.trainning.pdv.domain.network.APIClient;
 import br.com.trainning.pdv.domain.util.Base64Util;
 import br.com.trainning.pdv.domain.util.ImageInputHelper;
 import butterknife.Bind;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import se.emilsjolander.sprinkles.Query;
 
 public class CadastroNovoActivity extends BasicActivity implements ImageInputHelper.ImageActionListener{
 
@@ -51,6 +60,9 @@ public class CadastroNovoActivity extends BasicActivity implements ImageInputHel
     private Produto produto;
     private Double latitude = 0.0d;
     private Double longitude = 0.0d;
+    private AlertDialog dialog;
+
+    Callback<String> callbackNovoProduto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +85,10 @@ public class CadastroNovoActivity extends BasicActivity implements ImageInputHel
 
         imageInputHelper = new ImageInputHelper(this);
         imageInputHelper.setImageActionListener(this);
+
+        dialog = new SpotsDialog(this,"Enviando....");
+
+        configureNovoProdutoCallback();
 
         /*txtDescricao = (EditText)findViewById(R.id.txtDescricao);
         txtUnidade = (EditText)findViewById(R.id.txtUnidade);
@@ -107,9 +123,16 @@ public class CadastroNovoActivity extends BasicActivity implements ImageInputHel
 
                 produto.setLatitude(latitude);
                 produto.setLongitude(longitude);
+                produto.setStatus(0);
 
                 produto.save();
-                finish();
+
+                dialog.show();
+
+                new APIClient().getRestService().createProduto(produto.getCodigoBarras(),produto.getDescricao(),produto.getUnidade(),produto.getPreco(),produto.getFoto(),produto.getStatus(),produto.getLatitude(),produto.getLongitude(),callbackNovoProduto);
+
+
+
             }
         });
     }
@@ -157,5 +180,29 @@ public class CadastroNovoActivity extends BasicActivity implements ImageInputHel
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void configureNovoProdutoCallback() {
+
+        callbackNovoProduto = new Callback<String>() {
+
+            @Override public void success(String resultado, Response response) {
+
+                dialog.dismiss();
+
+                finish();
+            }
+
+            @Override public void failure(RetrofitError error) {
+
+                dialog.dismiss();
+
+
+
+               Snackbar.make(findViewById(android.R.id.content).getRootView(),error.getMessage(),Snackbar.LENGTH_SHORT).show();
+
+                Log.e("RETROFIT", "Error:"+error.getMessage());
+            }
+        };
     }
 }

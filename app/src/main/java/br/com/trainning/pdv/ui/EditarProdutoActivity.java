@@ -1,5 +1,6 @@
 package br.com.trainning.pdv.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -32,10 +33,15 @@ import java.util.List;
 
 import br.com.trainning.pdv.R;
 import br.com.trainning.pdv.domain.model.Produto;
+import br.com.trainning.pdv.domain.network.APIClient;
 import br.com.trainning.pdv.domain.util.Base64Util;
 import br.com.trainning.pdv.domain.util.ImageInputHelper;
 import butterknife.Bind;
 import butterknife.OnClick;
+import dmax.dialog.SpotsDialog;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 import se.emilsjolander.sprinkles.Query;
 
 public class EditarProdutoActivity extends BasicActivity implements ImageInputHelper.ImageActionListener {
@@ -63,6 +69,9 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
     private ImageInputHelper imageInputHelper;
     private Double latitude = 0.0d;
     private Double longitude = 0.0d;
+
+    Callback<String> callbackNovoEditar;
+    private AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +107,12 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
 
         LocationServices.FusedLocationApi.requestLocationUpdates(request, listener);
 
+        configureNovoEditarCallback();
+
         imageInputHelper = new ImageInputHelper(this);
         imageInputHelper.setImageActionListener(this);
+
+        dialog = new SpotsDialog(this,"Enviando....");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -120,8 +133,13 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
 
                 produto.setLatitude(latitude);
                 produto.setLongitude(longitude);
+                produto.setStatus(1);
+
+                dialog.show();
 
                 produto.save();
+
+                new APIClient().getRestService().updateProduto(produto.getCodigoBarras(),produto.getDescricao(),produto.getUnidade(),produto.getPreco(),produto.getFoto(),produto.getStatus(),produto.getLatitude(),produto.getLongitude(),callbackNovoEditar);
 
                 Snackbar.make(view,"Produto alterado com sucesso!",Snackbar.LENGTH_SHORT).show();
             }
@@ -224,6 +242,30 @@ public class EditarProdutoActivity extends BasicActivity implements ImageInputHe
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void configureNovoEditarCallback() {
+
+        callbackNovoEditar = new Callback<String>() {
+
+            @Override public void success(String resultado, Response response) {
+
+                dialog.dismiss();
+
+                finish();
+            }
+
+            @Override public void failure(RetrofitError error) {
+
+                dialog.dismiss();
+
+
+
+                Snackbar.make(findViewById(android.R.id.content).getRootView(),error.getMessage(),Snackbar.LENGTH_SHORT).show();
+
+                Log.e("RETROFIT", "Error:"+error.getMessage());
+            }
+        };
     }
 
 }
