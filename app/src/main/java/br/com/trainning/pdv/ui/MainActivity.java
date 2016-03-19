@@ -92,7 +92,6 @@ public class MainActivity extends BasicActivity {
         idCompra = Util.getUniquePsuedoID();
 
         carrinho = new Carrinho();
-        carrinho.setId(0);
         carrinho.setIdCompra(idCompra);
         carrinho.setEncerrada(0);
         carrinho.setEnviada(0);
@@ -246,11 +245,9 @@ public class MainActivity extends BasicActivity {
                     .setPositive("Sim", new MaterialDialog.SingleButtonCallback() {
                         @Override
                         public void onClick(MaterialDialog dialog, DialogAction which) {
-
+                            dialog.dismiss();
                             MainActivity.this.dialog.show();
-
                             new APIClient().getRestService().enviarCompra(compra,callbackCompra);
-
                             Log.d("MaterialStyledDialogs", "Do something!");
 
                         }
@@ -259,10 +256,12 @@ public class MainActivity extends BasicActivity {
                         @Override
                         public void onClick(MaterialDialog dialog, DialogAction which) {
                             //nada!!!
+                            dialog.dismiss();
                             Log.d("MaterialStyledDialogs", "Cancelado pelo usuários");
                         }
                     })
                     .build();
+            dialog.show();
 
         }
 
@@ -310,7 +309,7 @@ public class MainActivity extends BasicActivity {
     }
 
     public void popularLista(){
-        List<Item> listaItem = Query.many(Item.class, "select * from item where id_compra = ? order by id", 1).get().asList();
+        List<Item> listaItem = Query.many(Item.class, "select * from item where id_compra = ? order by id", idCompra).get().asList();
         Log.d("TAMANHOLISTA",""+ listaItem.size());
 
         ItemProduto itemProduto;
@@ -390,6 +389,21 @@ public class MainActivity extends BasicActivity {
 
             @Override public void success(String resultado, Response response) {
 
+
+                List<Item> itens = Query.all(Item.class).get().asList();
+
+                for(Item it:itens)
+                {
+                    it.delete();
+                }
+
+                carrinho = new Carrinho();
+                idCompra = Util.getUniquePsuedoID();
+                carrinho.setIdCompra(idCompra);
+                carrinho.setEnviada(0);
+                carrinho.setEncerrada(0);
+
+                popularLista();
 
                 dialog.dismiss();
 
