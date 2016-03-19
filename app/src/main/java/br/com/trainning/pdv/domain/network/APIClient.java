@@ -2,13 +2,16 @@ package br.com.trainning.pdv.domain.network;
 
 import java.util.List;
 
+import br.com.trainning.pdv.domain.model.Compra;
 import br.com.trainning.pdv.domain.model.Produto;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
+import retrofit.http.Body;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
+import retrofit.http.Headers;
 import retrofit.http.POST;
 import retrofit.http.PUT;
 import retrofit.http.Path;
@@ -73,7 +76,12 @@ public class APIClient {
                 @Field("longitude") double longitude,
                 Callback<String> callbackUpdateProduto
         );
+
+        @Headers( "Content-Type: application/json" )
+        @POST("/compra/cadastro")
+        void enviarCompra(
+                @Body Compra compra,
+                Callback<String> callBackCompra
+        );
     }
-
-
 }

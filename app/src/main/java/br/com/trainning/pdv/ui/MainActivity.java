@@ -16,16 +16,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.github.javiersantos.materialstyleddialogs.MaterialStyledDialog;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.com.trainning.pdv.R;
 import br.com.trainning.pdv.domain.adapter.CustomArrayAdapter;
+import br.com.trainning.pdv.domain.model.Carrinho;
+import br.com.trainning.pdv.domain.model.Compra;
 import br.com.trainning.pdv.domain.model.Item;
 import br.com.trainning.pdv.domain.model.ItemProduto;
 import br.com.trainning.pdv.domain.model.Produto;
@@ -54,8 +59,13 @@ public class MainActivity extends BasicActivity {
     private CustomArrayAdapter adapter;
 
     private Callback<List<Produto>> callbackProdutos;
+    private Callback<String> callbackCompra;
+
     private  AlertDialog dialog;
     private String idCompra;
+
+    private Carrinho carrinho;
+    private Compra compra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +81,7 @@ public class MainActivity extends BasicActivity {
 
 
         configureProdutoCallback();
+        configureCompraCallback();
 
         List<Item> itens = Query.all(Item.class).get().asList();
         for (Item item:itens)
@@ -79,6 +90,12 @@ public class MainActivity extends BasicActivity {
         }
 
         idCompra = Util.getUniquePsuedoID();
+
+        carrinho = new Carrinho();
+        carrinho.setId(0);
+        carrinho.setIdCompra(idCompra);
+        carrinho.setEncerrada(0);
+        carrinho.setEnviada(0);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +170,7 @@ public class MainActivity extends BasicActivity {
 
         popularLista();
 
+
     }
 
     @Override
@@ -199,6 +217,52 @@ public class MainActivity extends BasicActivity {
         }else if (id == R.id.action_sincronia) {
             dialog.show();
             new APIClient().getRestService().getAllProdutos(callbackProdutos);
+        }
+        else if (id == R.id.action_fecha_compra) {
+
+            List<Item> itens = Query.all(Item.class).get().asList();
+
+            int quantidadedeItens = 0;
+            double precoTotal = 0.0d;
+            Produto produto;
+
+            for(Item it:itens)
+            {
+                quantidadeItens += it.getQuantidade();
+
+                produto = Query.one(Produto.class,"select * from produto where codigo_barra = ?", it.getIdProduto()).get();
+
+                precoTotal += it.getQuantidade() * produto.getPreco();
+
+            }
+
+            compra = new Compra();
+            compra.setCarrinho(carrinho);
+            compra.setItens(itens);
+
+            MaterialStyledDialog dialog = new MaterialStyledDialog(this)
+                    .setTitle("Fechar Compra?")
+                    .setDescription("Quantidade de Volumes " + quantidadedeItens + " Total R$ " + precoTotal)
+                    .setPositive("Sim", new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+
+                            MainActivity.this.dialog.show();
+
+                            new APIClient().getRestService().enviarCompra(compra,callbackCompra);
+
+                            Log.d("MaterialStyledDialogs", "Do something!");
+
+                        }
+                    })
+                    .setNegative("Não", new MaterialDialog.SingleButtonCallback() {
+                        @Override
+                        public void onClick(MaterialDialog dialog, DialogAction which) {
+                            //nada!!!
+                            Log.d("MaterialStyledDialogs", "Cancelado pelo usuários");
+                        }
+                    })
+                    .build();
 
         }
 
@@ -306,6 +370,27 @@ public class MainActivity extends BasicActivity {
 
                     produto.save();
                 }
+                dialog.dismiss();
+
+            }
+
+
+
+            @Override public void failure(RetrofitError error) {
+
+                dialog.dismiss();
+                Log.e("RETROFIT", "Error:"+error.getMessage());
+            }
+        };
+    }
+
+    private void configureCompraCallback() {
+
+        callbackCompra = new Callback<String>() {
+
+            @Override public void success(String resultado, Response response) {
+
+
                 dialog.dismiss();
 
             }
