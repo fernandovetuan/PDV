@@ -1,5 +1,6 @@
 package br.com.trainning.pdv.ui;
 
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Intent;
 import android.graphics.Color;
@@ -31,6 +32,7 @@ import br.com.trainning.pdv.domain.model.Produto;
 import br.com.trainning.pdv.domain.network.APIClient;
 import br.com.trainning.pdv.domain.util.Util;
 import butterknife.Bind;
+import dmax.dialog.SpotsDialog;
 import jim.h.common.android.lib.zxing.config.ZXingLibConfig;
 import jim.h.common.android.lib.zxing.integrator.IntentIntegrator;
 import jim.h.common.android.lib.zxing.integrator.IntentResult;
@@ -52,6 +54,7 @@ public class MainActivity extends BasicActivity {
     private CustomArrayAdapter adapter;
 
     private Callback<List<Produto>> callbackProdutos;
+    private   AlertDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +66,12 @@ public class MainActivity extends BasicActivity {
         zxingLibConfig = new ZXingLibConfig();
         zxingLibConfig.useFrontLight = true;
 
+        dialog = new SpotsDialog(this,"Carregando....");
+
+
         configureProdutoCallback();
+
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -182,6 +190,7 @@ public class MainActivity extends BasicActivity {
             Intent intent2 = new Intent(MainActivity.this, EditarProdutoActivity.class);
             startActivity(intent2);
         }else if (id == R.id.action_sincronia) {
+            dialog.show();
             new APIClient().getRestService().getAllProdutos(callbackProdutos);
 
         }
@@ -285,14 +294,18 @@ public class MainActivity extends BasicActivity {
                 }
 
                 for(Produto produto:resultado){
+
                     produto.setId(0L);
+
                     produto.save();
                 }
+                dialog.dismiss();
 
             }
 
             @Override public void failure(RetrofitError error) {
 
+                dialog.dismiss();
                 Log.e("RETROFIT", "Error:"+error.getMessage());
             }
         };
