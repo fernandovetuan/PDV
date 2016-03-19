@@ -54,7 +54,8 @@ public class MainActivity extends BasicActivity {
     private CustomArrayAdapter adapter;
 
     private Callback<List<Produto>> callbackProdutos;
-    private   AlertDialog dialog;
+    private  AlertDialog dialog;
+    private String idCompra;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,13 @@ public class MainActivity extends BasicActivity {
 
         configureProdutoCallback();
 
+        List<Item> itens = Query.all(Item.class).get().asList();
+        for (Item item:itens)
+        {
+            item.delete();
+        }
 
+        idCompra = Util.getUniquePsuedoID();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -219,7 +226,7 @@ public class MainActivity extends BasicActivity {
                     {
                         Item item = new Item();
                         item.setId(0L);
-                        item.setIdCompra(1L);
+                        item.setIdCompra(idCompra);
                         item.setIdProduto(produto.getCodigoBarras());
                         item.setQuantidade(1);
                         item.save();
@@ -265,7 +272,7 @@ public class MainActivity extends BasicActivity {
 
             produto = Query.one(Produto.class,"select * from produto where codigo_barra = ?", item.getIdProduto()).get();
             itemProduto = new ItemProduto();
-            itemProduto.setIdCompra(1);
+            itemProduto.setIdCompra(idCompra);
             itemProduto.setIdItem(item.getId());
             itemProduto.setFoto(produto.getFoto());
             itemProduto.setUnidade(produto.getUnidade());
