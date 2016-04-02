@@ -48,7 +48,7 @@ public class EspressoTest {
     private final String TESTE_DESCRICAO="Produto Teste";
     private final String TESTE_UNIDADE="pc";
     private final String TESTE_PRECO="4.83";
-    private final String TESTE_CODIGO_BARRA="789000000000";
+    private final String TESTE_CODIGO_BARRA="78927149692798";
     private final String TESTE_FOTO="foto";
     private final String TESTE_DESCRICAO_REPLACE="Produto Teste Editado";
     private final String TESTE_UNIDADE_REPLACE="un";
@@ -81,7 +81,7 @@ public class EspressoTest {
     @Test
     public void cadastroNovoProduto(){
 
-        long waitingTime = DateUtils.SECOND_IN_MILLIS * 3;
+        long waitingTime = DateUtils.SECOND_IN_MILLIS * 10;
 
         // Make sure Espresso does not time out
         IdlingPolicies.setMasterPolicyTimeout(
@@ -95,19 +95,24 @@ public class EspressoTest {
         onView(withText("Novo Produto"))
                 .perform(click());
 
-        onView(withId(getResourceId("editTextDescricao")))
-                .perform(typeText(TESTE_DESCRICAO));
-        onView(withId(getResourceId("editTextUnidade")))
-                .perform(typeText(TESTE_UNIDADE));
-        onView(withId(getResourceId("editTextPreco")))
-                .perform(typeText(TESTE_PRECO));
-        onView(withId(getResourceId("editTextCodigo")))
+        onView(withId(getResourceId("txtDescricao")))
+                .perform(typeText(TESTE_DESCRICAO), closeSoftKeyboard());
+        onView(withId(getResourceId("txtUnidade")))
+                .perform(typeText(TESTE_UNIDADE), closeSoftKeyboard());
+        onView(withId(getResourceId("txtPreco")))
+                .perform(typeText(TESTE_PRECO), closeSoftKeyboard());
+        onView(withId(getResourceId("txtCodigoBarras")))
                 .perform(typeText(TESTE_CODIGO_BARRA), closeSoftKeyboard());
+
+
+        // Now we wait
+        IdlingResource idlingResource1 = new ElapsedTimeIdlingResource(waitingTime);
+        Espresso.registerIdlingResources(idlingResource1);
 
 
         onView(withId(getResourceId("fab"))).perform(click());
 
-
+        Espresso.unregisterIdlingResources(idlingResource1);
         // Now we wait
         IdlingResource idlingResource = new ElapsedTimeIdlingResource(waitingTime);
         Espresso.registerIdlingResources(idlingResource);
@@ -115,21 +120,21 @@ public class EspressoTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         // Click the item.
-        onView(withText("Editar produto"))
+        onView(withText("Editar Produto"))
                 .perform(click());
 
-        onView(withId(getResourceId("spinner"))).perform(click());
+        onView(withId(getResourceId("ddlProduto"))).perform(click());
         onData(allOf(is(instanceOf(String.class)), is(TESTE_CODIGO_BARRA))).perform(click());
         //onView(withId(spinnerId)).check(matches(withSpinnerText(containsString(selectionText))));
 
-        onView(withId(getResourceId("editTextDescricao"))).check(matches(withText(TESTE_DESCRICAO)));
-        onView(withId(getResourceId("editTextUnidade"))).check(matches(withText(TESTE_UNIDADE)));
-        onView(withId(getResourceId("editTextPreco"))).check(matches(withText(TESTE_PRECO)));
-        onView(withId(getResourceId("editTextCodigo"))).check(matches(withText(TESTE_CODIGO_BARRA)));
+        onView(withId(getResourceId("txtDescricao"))).check(matches(withText(TESTE_DESCRICAO)));
+        onView(withId(getResourceId("txtUnidade"))).check(matches(withText(TESTE_UNIDADE)));
+        onView(withId(getResourceId("txtPreco"))).check(matches(withText(TESTE_PRECO)));
+        onView(withId(getResourceId("txtCodigoBarras"))).check(matches(withText(TESTE_CODIGO_BARRA)));
 
-        onView(withId(getResourceId("editTextDescricao"))).perform(clearText(), typeText(TESTE_DESCRICAO_REPLACE));
-        onView(withId(getResourceId("editTextUnidade"))).perform(clearText(), typeText(TESTE_UNIDADE_REPLACE));
-        onView(withId(getResourceId("editTextPreco"))).perform(clearText(), typeText(TESTE_PRECO_REPLACE));
+        onView(withId(getResourceId("txtDescricao"))).perform(clearText(), typeText(TESTE_DESCRICAO_REPLACE), closeSoftKeyboard());
+        onView(withId(getResourceId("txtUnidade"))).perform(clearText(), typeText(TESTE_UNIDADE_REPLACE), closeSoftKeyboard());
+        onView(withId(getResourceId("txtPreco"))).perform(clearText(), typeText(TESTE_PRECO_REPLACE), closeSoftKeyboard());
 
 
         onView(withId(getResourceId("fab"))).perform(click());
@@ -142,16 +147,16 @@ public class EspressoTest {
         openActionBarOverflowOrOptionsMenu(getInstrumentation().getTargetContext());
 
         // Click the item.
-        onView(withText("Editar produto"))
+        onView(withText("Editar Produto"))
                 .perform(click());
 
-        onView(withId(getResourceId("spinner"))).perform(click());
+        onView(withId(getResourceId("ddlProduto"))).perform(click());
         onData(allOf(is(instanceOf(String.class)), is(TESTE_CODIGO_BARRA))).perform(click());
 
-        onView(withId(getResourceId("editTextDescricao"))).check(matches(withText(TESTE_DESCRICAO_REPLACE)));
-        onView(withId(getResourceId("editTextUnidade"))).check(matches(withText(TESTE_UNIDADE_REPLACE)));
-        onView(withId(getResourceId("editTextPreco"))).check(matches(withText(TESTE_PRECO_REPLACE)));
-        onView(withId(getResourceId("editTextCodigo"))).check(matches(withText(TESTE_CODIGO_BARRA)));
+        onView(withId(getResourceId("txtDescricao"))).check(matches(withText(TESTE_DESCRICAO_REPLACE)));
+        onView(withId(getResourceId("txtUnidade"))).check(matches(withText(TESTE_UNIDADE_REPLACE)));
+        onView(withId(getResourceId("txtPreco"))).check(matches(withText(TESTE_PRECO_REPLACE)));
+        onView(withId(getResourceId("txtCodigoBarras"))).check(matches(withText(TESTE_CODIGO_BARRA)));
 
         Espresso.pressBack();
 
