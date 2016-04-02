@@ -213,6 +213,11 @@ public class MainActivity extends BasicActivity {
         }else if (id == R.id.action_edit) {
             Intent intent2 = new Intent(MainActivity.this, EditarProdutoActivity.class);
             startActivity(intent2);
+        }
+        else if (id == R.id.action_mapa) {
+            Intent intent3 = new Intent(MainActivity.this, MapaActivity.class);
+            startActivity(intent3);
+
         }else if (id == R.id.action_sincronia) {
             dialog.show();
             new APIClient().getRestService().getAllProdutos(callbackProdutos);
