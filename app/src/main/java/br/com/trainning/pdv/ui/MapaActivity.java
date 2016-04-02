@@ -17,6 +17,7 @@ import br.com.trainning.pdv.R;
 import br.com.trainning.pdv.domain.model.Produto;
 import br.com.trainning.pdv.domain.util.Util;
 import butterknife.Bind;
+import butterknife.OnClick;
 import se.emilsjolander.sprinkles.CursorList;
 import se.emilsjolander.sprinkles.Query;
 
@@ -47,13 +48,30 @@ public class MapaActivity extends BasicActivity {
 
         for(Produto produto : listaProdutos) {
             Log.d("PRODUTO", produto.toString());
-            mapView.addMarker(new MarkerOptions()
-                    .position(new LatLng(produto.getLatitude(), produto.getLongitude()))
-                    .title(produto.getDescricao())
-                    .snippet(Util.getCurrencyValue(produto.getPreco()) + " " + produto.getUnidade()));
+            if (produto.getLatitude() + produto.getLongitude() != 0.0)
+            {
+                mapView.addMarker(new MarkerOptions()
+                        .position(new LatLng(produto.getLatitude(), produto.getLongitude()))
+                        .title(produto.getDescricao())
+                        .snippet(Util.getCurrencyValue(produto.getPreco()) + " " + produto.getUnidade()));
+            }
+
         }
 
         mapView.onCreate(savedInstanceState);
+
+    }
+
+    @OnClick(R.id.butruas)
+    public void onClickRuas()
+    {
+        mapView.setStyleUrl(Style.MAPBOX_STREETS);
+    }
+
+    @OnClick(R.id.butsatelite)
+    public void onClickSatelite()
+    {
+        mapView.setStyleUrl(Style.SATELLITE);
     }
 
     @Override
